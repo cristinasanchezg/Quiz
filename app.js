@@ -4,12 +4,11 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-var partials =require('express-partials');
+var partials = require('express-partials');
 var methodOverride = require('method-override');
 var session = require('express-session');
 
 var routes = require('./routes/index');
-
 
 var app = express();
 
@@ -18,8 +17,8 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
 app.use(partials());
-
 // uncomment after placing your favicon in /public
+// app.use(favicon(__dirname + '/public/favicon.ico'));
 app.use(favicon(__dirname + '/public/favicon.ico'));
 app.use(logger('dev'));
 app.use(bodyParser.json());
@@ -30,6 +29,7 @@ app.use(session());
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Helpers dinamicos:
 app.use(function(req, res, next) {
 
   // guardar path en session.redir para despues de login
@@ -43,7 +43,6 @@ app.use(function(req, res, next) {
 });
 
 app.use('/', routes);
-
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

@@ -1,5 +1,29 @@
 var models = require('../models/models.js');
 
+// MW que permite acciones solamente si el quiz al que pertenece el comentario objeto pertenece al usuario logeado o si es cuenta admin
+exports.ownershipRequired = function(req, res, next){
+    models.Quiz.find({
+            where: {
+                  id: Number(req.comment.QuizId)
+            }
+        }).then(function(quiz) {
+            if (quiz) {
+                var objQuizOwner = quiz.UserId;
+                var logUser = req.session.user.id;
+                var isAdmin = req.session.user.isAdmin;
+
+                console.log(objQuizOwner, logUser, isAdmin);
+
+                if (isAdmin || objQuizOwner === logUser) {
+                    next();
+                } else {
+                    res.redirect('/');
+                }
+            } else{next(new Error('No existe quizId=' + quizId))}
+        }
+    ).catch(function(error){next(error)});
+};
+
 // Autoload :id de comentarios
 exports.load = function(req, res, next, commentId) {
   models.Comment.find({
@@ -19,17 +43,6 @@ exports.load = function(req, res, next, commentId) {
 exports.new = function(req, res) {
   res.render('comments/new.ejs', {quizid: req.params.quizId, errors: []});
 };
-
-// GET /quizes/:quizId/comments/:commentId/publish
-exports.publish = function(req, res) {
-  req.comment.publicado = true;
-
-  req.comment.save( {fields: ["publicado"]})
-    .then( function(){ res.redirect('/quizes/'+req.params.quizId);} )
-    .catch(function(error){next(error)});
-
-  }; 
-
 
 // POST /quizes/:quizId/comments
 exports.create = function(req, res) {
@@ -52,4 +65,14 @@ exports.create = function(req, res) {
     }
   ).catch(function(error){next(error)});
   
+};
+
+// GET /quizes/:quizId/comments/:commentId/publish
+exports.publish = function(req, res) {
+  req.comment.publicado = true;
+
+  req.comment.save( {fields: ["publicado"]})
+    .then( function(){ res.redirect('/quizes/'+req.params.quizId);} )
+    .catch(function(error){next(error)});
+
 };
