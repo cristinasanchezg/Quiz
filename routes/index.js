@@ -12,6 +12,10 @@ router.get('/', function(req, res) {
   res.render('index', { title: 'Quiz', errors: []});
 });
 
+router.get('/author', function(req,res){
+	res.render('author', {title:'Quiz', errors: []});
+});
+
 // Autoload de comandos con ids
 router.param('quizId', quizController.load);  // autoload :quizId
 router.param('commentId', commentController.load);  // autoload :commentId
